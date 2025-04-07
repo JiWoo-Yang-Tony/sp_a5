@@ -1,12 +1,29 @@
 CC = gcc
-CFLAGS = -Wall -Werror
-SRC = ./src/dp1.c
-OUT = ./bin/DP-1
+CFLAGS = -Wall -Iinclude -Iinc
 
-all: $(OUT)
+SRC_DIR = src
+OBJ_DIR = obj
+BIN_DIR = bin
 
-$(OUT): $(SRC)
-	$(CC) $(CFLAGS) -o $(OUT) $(SRC)
+OBJS = $(OBJ_DIR)/dp1.o $(OBJ_DIR)/dp2.o $(OBJ_DIR)/dc.o
+
+all: $(BIN_DIR)/DP-1 $(BIN_DIR)/DP-2 $(BIN_DIR)/DC
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(BIN_DIR)/DP-1: $(OBJ_DIR)/dp1.o
+	@mkdir -p $(BIN_DIR)
+	$(CC) -o $@ $<
+
+$(BIN_DIR)/DP-2: $(OBJ_DIR)/dp2.o
+	@mkdir -p $(BIN_DIR)
+	$(CC) -o $@ $<
+
+$(BIN_DIR)/DC: $(OBJ_DIR)/dc.o
+	@mkdir -p $(BIN_DIR)
+	$(CC) -o $@ $<
 
 clean:
-	rm -f $(OUT)
+	rm -rf $(OBJ_DIR) $(BIN_DIR)

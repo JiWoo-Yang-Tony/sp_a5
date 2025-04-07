@@ -1,6 +1,6 @@
 #include "shared.h"
 
 int main() {
-    printf("Hello, DP-1!\n");
+    printf("Hello, DC!\n");
     return 0;
 }
