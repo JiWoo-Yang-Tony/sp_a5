@@ -10,19 +10,21 @@ The goal is to implement a Linux-based inter-process communication system in ANS
 
 ## 📁 Project Structure
 
+```text
 HISTO-SYSTEM/
 ├── bin/
-│ ├── DP-1
-│ ├── DP-2
-│ ├── DC
+│   ├── DP-1
+│   ├── DP-2
+│   └── DC
 ├── src/
-│ ├── dp1.c
-│ ├── dp2.c
-│ └── dc.c
+│   ├── dp1.c
+│   ├── dp2.c
+│   └── dc.c
 ├── inc/
-│ └── shared.h
+│   └── shared.h
 ├── Makefile
 └── README.md
+```
 
 ---
 
