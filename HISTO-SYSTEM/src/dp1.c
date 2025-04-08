@@ -52,6 +52,40 @@ int initialize_semaphore()
     return semID;
 }
 
+void write_random_letters(SharedMemory *shmPtr, int semID)
+{
+    // 5. Generate 20 random letters ('A'-'T')
+    char letters[ALPHABET_COUNT] = {
+        'A','B','C','D','E','F','G','H','I','J',
+        'K','L','M','N','O','P','Q','R','S','T'
+    };
+
+    for (int i = 0; i < 20; i++)
+    {
+        char letter = letters[rand() % ALPHABET_COUNT];
+
+        // 6. Lock semaphore
+        sem_wait(semID);
+
+        int nextIndex = (shmPtr->writeIndex + 1) % BUF_SIZE;
+
+        // 7. Check space, write as many as possible
+        if (nextIndex == shmPtr->readIndex)
+        {
+            printf("[DP-1] buffer full, cannot write '%c'\n", letter);  // Debug message [ERASE BEFORE SUBMISSION]
+            sem_signal(semID);  // Unlock semaphore
+            break;
+        }
+
+        // 8. Update writeIndex (wrap around if needed)
+        shmPtr->buffer[shmPtr->writeIndex] = letter;
+        shmPtr->writeIndex = nextIndex;
+
+        // 9. Unlock semaphore
+        sem_signal(semID);
+    }
+}
+
 int main()
 {
     printf("Hello, DP-1!\n");   // Debug message [ERASE BEFORE SUBMISSION]
@@ -89,15 +123,13 @@ int main()
         printf("[DP-1] Forked DP-2 with PID %d\n", pid);    // Debug message [ERASE BEFORE SUBMISSION]
     }
 
-    // while (1)
-    // {
-        // 5. Generate 20 random letters ('A'-'T')
-        // 6. Lock semaphore
-        // 7. Check space, write as many as possible
-        // 8. Update writeIndex (wrap around if needed)
-        // 9. Unlock semaphore
+    while (1)
+    {
+        write_random_letters(shmPtr, semID);
+
         // 10. Sleep 2 seconds
-    // }
+        sleep(2);
+    }
 
     return 0;
 }
