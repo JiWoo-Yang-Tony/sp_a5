@@ -1,6 +1,6 @@
 // FILE NAME    : dp1.c
 // PROGRAMMER   : 
-// DATE         : 2023-10-01
+// DATE         : 2025-4-8
 // DESCRIPTION  : 
 
 #include "shared.h"
@@ -54,7 +54,7 @@ int initialize_semaphore()
 
 int main()
 {
-    printf("Hello, DP-1!\n");
+    printf("Hello, DP-1!\n");   // Debug message [ERASE BEFORE SUBMISSION]
 
     int shmID;
     int semID;
