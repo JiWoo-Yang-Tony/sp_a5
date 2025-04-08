@@ -76,9 +76,9 @@ void write_random_letters(SharedMemory *shmPtr, int semID)
             sem_signal(semID);  // Unlock semaphore
             break;
         }
+        shmPtr->buffer[shmPtr->writeIndex] = letter;
 
         // 8. Update writeIndex (wrap around if needed)
-        shmPtr->buffer[shmPtr->writeIndex] = letter;
         shmPtr->writeIndex = nextIndex;
 
         // 9. Unlock semaphore
@@ -123,12 +123,12 @@ int main()
         printf("[DP-1] Forked DP-2 with PID %d\n", pid);    // Debug message [ERASE BEFORE SUBMISSION]
     }
 
+    srand(time(NULL));  // Seed random number generator
+
     while (1)
     {
-        write_random_letters(shmPtr, semID);
-
-        // 10. Sleep 2 seconds
-        sleep(2);
+        write_random_letters(shmPtr, semID);       
+        sleep(2);   // 10. Sleep 2 seconds
     }
 
     return 0;

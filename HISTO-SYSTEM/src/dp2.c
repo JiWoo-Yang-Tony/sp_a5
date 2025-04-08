@@ -5,6 +5,40 @@
 
 #include "shared.h"
 
+void write_one_letter(SharedMemory *shmPtr, int semID)
+{
+    // 6. Generate 1 random letter ('A'-'T')
+    char letters[ALPHABET_COUNT] = {
+        'A','B','C','D','E','F','G','H','I','J',
+        'K','L','M','N','O','P','Q','R','S','T'
+    };
+
+    char letter = letters[rand() % ALPHABET_COUNT];
+
+    // 7. Lock semaphore
+    sem_wait(semID);
+
+    int nextIndex = (shmPtr->writeIndex + 1) % BUF_SIZE;
+
+    // 8. Check space, write if buffer is not full
+    if (nextIndex == shmPtr->readIndex)
+    {
+        printf("[DP-2] buffer full, cannot write '%c'\n", letter);  // Debug message [ERASE BEFORE SUBMISSION]
+        sem_signal(semID);  // Unlock semaphore
+        return;
+    }
+
+    // 9. Write one letter
+    shmPtr->buffer[shmPtr->writeIndex] = letter;
+
+    // 10. Update writeIndex (wrap around)
+    shmPtr->writeIndex = nextIndex;
+    printf("[DP-2] wrote '%c' to buffer at index %d\n", letter, shmPtr->writeIndex);  // Debug message [ERASE BEFORE SUBMISSION]
+
+    // 11. Unlock semaphore
+    sem_signal(semID);
+}
+
 int main(int argc, char* argv[])
 {
     printf("Hello, DP-2!\n");   // Debug message [ERASE BEFORE SUBMISSION]
@@ -32,15 +66,21 @@ int main(int argc, char* argv[])
 
     printf("[DP-2] Successfully attached to shared memory (ID: %d)\n", shmID);  // Debug message [ERASE BEFORE SUBMISSION]
 
-    // while (1)
-    // {
-        // 6. Generate 1 random letter ('A'-'T')
-        // 7. Lock semaphore
-        // 8. Write one letter if buffer is not full
-        // 9. Update writeIndex (wrap around)
-        // 10. Unlock semaphore
-        // 11. Sleep 1/20 second (usleep)
-    // }
+    // Attach to semaphore
+    int semID = semget(SEM_KEY, 1, 0);
+    if (semID < 0)
+    {
+        perror("[DP-2] semget failed");
+        exit(EXIT_FAILURE);
+    }
+
+    srand(time(NULL) + getpid());   // randomize seed with PID to avoid same sequence with DP-1
+
+    while (1)
+    {
+        write_one_letter(shmPtr, semID);
+        usleep(50000);  // 11. Sleep 1/20 second
+    }
     
     return 0;
 }
