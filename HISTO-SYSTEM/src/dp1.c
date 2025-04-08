@@ -1,3 +1,8 @@
+// FILE NAME    : dp1.c
+// PROGRAMMER   : 
+// DATE         : 2023-10-01
+// DESCRIPTION  : 
+
 #include "shared.h"
 
 void initialize_shared_memory(int *shmID, SharedMemory **shmPtr)
@@ -58,10 +63,31 @@ int main()
     // 1. Create shared memory
     initialize_shared_memory(&shmID, &shmPtr);
     
+    // 2. Initialize circular buffer inside initialize_shared_memory()
     // 3. Create and initialize semaphore
     semID = initialize_semaphore();
 
     // 4. Fork and exec DP-2 with shmID as argv
+    pid_t pid = fork();
+
+    if (pid < 0)
+    {
+        perror("fork failed");
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        char shmStr[16];
+        snprintf(shmStr, sizeof(shmStr), "%d", shmID);
+
+        // Child process: exec DP-2
+        char *args[] = { "./bin/DP-2", shmStr, NULL };
+        execvp(args[0], args);
+
+        // If execvp fails, error handling
+        perror("execvp failed");
+        exit(EXIT_FAILURE);
+    } else {
+        printf("[DP-1] Forked DP-2 with PID %d\n", pid);    // Debug message [ERASE BEFORE SUBMISSION]
+    }
 
     // while (1)
     // {
