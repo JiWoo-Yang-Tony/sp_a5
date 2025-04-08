@@ -41,20 +41,20 @@ HISTO-SYSTEM/
 
 ## Milestones
 
-### Milestone 0: Project Setup
+### Milestone 0: Project Setup ✅
 - Create the directory structure.
 - Write shared.h for shared constants and data structures.
 - Implement Makefile to build all three programs.
 
-### Milestone 1: Shared Memory & Semaphore Initialization (DP-1)
+### Milestone 1: Shared Memory & Semaphore Initialization (DP-1) ✅
 - Allocate and initialize shared memory with read/write indices.
 - Create and initialize the semaphore.
 
-### Milestone 2: Launch DP-2 from DP-1
+### Milestone 2: Launch DP-2 from DP-1 ✅
 - Use fork() and exec() to start DP-2 from DP-1.
 - DP-2 receives shmID and attaches to shared memory.
 
-### Milestone 3: Writing to Buffer (DP-1 & DP-2)
+### Milestone 3: Writing to Buffer (DP-1 & DP-2) ✅
 - DP-1: Writes 20 random letters every 2 seconds.
 - DP-2: Writes 1 letter every 1/20 of a second.
 - Synchronize writes with the semaphore.
