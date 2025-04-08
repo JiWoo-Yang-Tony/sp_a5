@@ -8,7 +8,7 @@ The goal is to implement a Linux-based inter-process communication system in ANS
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 HISTO-SYSTEM/
@@ -28,7 +28,7 @@ HISTO-SYSTEM/
 
 ---
 
-## 🚀 System Overview
+## System Overview
 
 - **DP-1** creates shared memory and a semaphore.
 - **DP-2** is launched by DP-1 and attaches to shared memory.
@@ -39,20 +39,20 @@ HISTO-SYSTEM/
 
 ---
 
-## 📌 Milestones
+## Milestones
 
 ### Milestone 0: Project Setup
 - Create the directory structure.
-- Write `shared.h` for shared constants and data structures.
-- Implement `Makefile` to build all three programs.
+- Write shared.h for shared constants and data structures.
+- Implement Makefile to build all three programs.
 
 ### Milestone 1: Shared Memory & Semaphore Initialization (DP-1)
 - Allocate and initialize shared memory with read/write indices.
 - Create and initialize the semaphore.
 
 ### Milestone 2: Launch DP-2 from DP-1
-- Use `fork()` and `exec()` to start DP-2 from DP-1.
-- DP-2 receives `shmID` and attaches to shared memory.
+- Use fork() and exec() to start DP-2 from DP-1.
+- DP-2 receives shmID and attaches to shared memory.
 
 ### Milestone 3: Writing to Buffer (DP-1 & DP-2)
 - DP-1: Writes 20 random letters every 2 seconds.
@@ -73,25 +73,17 @@ HISTO-SYSTEM/
   - `*` for 100s
 
 ### Milestone 6: SIGINT Handling and Cleanup
-- All processes handle `SIGINT`.
-- DC sends `SIGINT` to both producers on termination.
-- Final histogram is printed, resources are cleaned, and `"Shazam !!"` is displayed.
+- All processes handle SIGINT.
+- DC sends SIGINT to both producers on termination.
+- Final histogram is printed, resources are cleaned, and "Shazam !!" is displayed.
 
 ---
 
-## 💡 Development Tips
+## Development Tips
 
-- Use `shared.h` to define all shared types, keys, and utility functions.
-- Each `.c` file should only include what it needs and rely on `shared.h` for shared structures.
-- Use `ipcs` to verify shared memory and semaphore creation.
-- Use `kill -2 <PID>` to manually test SIGINT on DC.
+- Use shared.h to define all shared types, keys, and utility functions.
+- Each .c file should only include what it needs and rely on `shared.h` for shared structures.
+- Use ipcs to verify shared memory and semaphore creation.
+- Use kill -2 <PID> to manually test SIGINT on DC.
 - Clean up all resources before exit: shared memory, semaphore, child processes.
-- Add debug `printf()`s during development but remove them before final submission.
-
----
-
-## 🛠️ Build Instructions
-
-```bash
-make        # Builds all three binaries in bin/
-make clean  # Removes compiled binaries and object files
+- Add debug printf()s during development but remove them before final submission.
