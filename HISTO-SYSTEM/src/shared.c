@@ -9,14 +9,6 @@
 volatile sig_atomic_t shutdown_flag = 0;
 
 
-// Shared memory struct 
-typedef struct {
-    char buffer[BUF_SIZE];  // 256-byte circular buffer
-    int readIndex;          // DC's read position
-    int writeIndex;         // DP's write position
-} SharedMemory;
-
-
 /*
  * FUNCTION :    sem_wait()
  * DESCRIPTION : Impliments the locking mechanism for the sephamore

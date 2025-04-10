@@ -6,7 +6,7 @@
 //                              1. Checks for shared memory, if not found, it will create the shared memory for the circular buffer
 //                                      This program is solely responsible for generating the shared memory key 
 //                              2. When the DP-1 program has attatched to the shared memory, it will initialize the shared memory elements
-//                              3. Launches it's fellow DP-2 process through a fork() call, passing only the shared memory ID and command line args 
+//                              3. Launches it's fellow DP-2 process through a fork() call, passing only the shared memory ID as its command line args 
 //                              
 //                              Main Loop: 
 //                              4.DP-1 will check the circular buffer to see how much room is available.
@@ -27,6 +27,36 @@
 #include "shared.h"
 #include "dp1.h"
 #include <signal.h>
+#include <time.h>
+#include <stdbool.h>
+#include <unistd.h>
+
+
+
+ // Global pointer for signal handler cleanup (necessary evil)
+static SharedMemory* global_shmPtr = NULL;
+
+
+
+
+
+/*
+ * FUNCTION :    signal_handler()
+ * DESCRIPTION : This function handles the SIGINT signal.
+ *               It detaches from shared memory and cleans up before exiting.
+ * PARAMETERS :  signum - signal number
+ * RETURNS :     none
+ */
+void handle_sigint(int sig) 
+{
+    if (global_shmPtr) 
+    {
+        shmdt(global_shmPtr);  // Detach shared memory
+    }
+    _exit(EXIT_SUCCESS);  // Exit immediately without cleanup
+}
+
+
 
 /*
  * FUNCTION :    main()
@@ -42,20 +72,30 @@ int main()
 {
     printf("Hello, DP-1!\n");   // Debug message [ERASE BEFORE SUBMISSION]
 
+
+    // Initalization Stage
+
     int shmID;
     int semID;
     SharedMemory *shmPtr;
 
-    // 1. Create shared memory
+	// Set up signal handler                                                                    TO DO : Place in new function for modularity
+    struct sigaction sa;
+    sa.sa_handler = handle_sigint;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGINT, &sa, NULL);
+
+
+    // Check for Shared Memory 
     initialize_shared_memory(&shmID, &shmPtr);
-    
-    // 2. Initialize circular buffer inside initialize_shared_memory()
-    
-    
-    // 3. Create and initialize semaphore
+       
+
+    // Initialize the Sephamore
     semID = initialize_semaphore();
 
-    // 4. Fork and exec DP-2 with shmID as argv
+
+    // Fork to start DP-2 with shmID                                                            TO DO : Place forking functionality in new function for modularity 
     pid_t pid = fork();
 
     if (pid < 0)
@@ -77,13 +117,21 @@ int main()
         printf("[DP-1] Forked DP-2 with PID %d\n", pid);    // Debug message [ERASE BEFORE SUBMISSION]
     }
 
-    //srand(time(NULL));  // Seed random number generator
+	// Initialize the random seed generator with current time for random number generation ( to pair with a letter in write_random_letters() )
+    srand(time(NULL));
 
-   // while (1)
-  //  {
-   //     write_random_letters(shmPtr, semID);       
-  //      sleep(2);   // 10. Sleep 2 seconds
-   // }
+    // Main Loop 
+
+	// Loop infinitely unless SIGINT is received
+	// 2 second pause between each call of write_random_letters()
+
+    while (1)
+    {
+		write_random_letters(shmPtr, semID);  // Write random letters to circular buffer
+		sleep(2);      // Sleep for 2 seconds  
+
+    }
+
 
     return 0;
 }
@@ -102,7 +150,7 @@ int main()
  * PARAMETERS :  shmID - pointer to shared memory ID
  *               shmPtr - pointer to SharedMemory structure
  * RETURNS :     none
- */ /
+ */
 
 void initialize_shared_memory(int *shmID, SharedMemory **shmPtr)
 {
@@ -180,63 +228,54 @@ int initialize_semaphore()
 * PARAMETERS :  shmPtr - pointer to SharedMemory structure
 *               semID - semaphore ID for synchronization
 * RETURNS :     none
- */ /
+ */
 
 void write_random_letters(SharedMemory *shmPtr, int semID)
 {
 
 
+     const char letters[ALPHABET_COUNT] = {
+       'A','B','C','D','E','F','G','H','I','J',
+       'K','L','M','N','O','P','Q','R','S','T'
+     };
+
+     // Lock semaphore for atomic operation
+     sem_wait(semID);
+
+     // Calculate available space before wrap around is needed 
+        // 1. (readIndex - writeIndex - 1) gives basic distance between pointers
+        // 2. + BUF_SIZE prevents negative values before modulo
+        // 3. % BUF_SIZE handles wrap-around cases
+     int available = (shmPtr->readIndex - shmPtr->writeIndex - 1 + BUF_SIZE) % BUF_SIZE;
 
 
 
+     // Determines how many letters to actually write (max 20)
+     // Uses ternary operator: if(available < 20) use available, else use 20
+     int to_write = (available < 20) ? available : 20;
+
+     // Loop to write the determined number of letters
+     for (int i = 0; i < to_write; i++) {
+         // Gets random letter:
+         // 1. rand() generates random number
+         // 2. % ALPHABET_COUNT constrains it to 0-19
+         // 3. Uses result as index in letters[] array
+         shmPtr->buffer[shmPtr->writeIndex] = letters[rand() % ALPHABET_COUNT];
+
+         // Updates write pointer with wrap-around:
+         // If writeIndex=255, (255+1)%256=0
+         shmPtr->writeIndex = (shmPtr->writeIndex + 1) % BUF_SIZE;
+     }
+
+     // Release semaphore
+     sem_signal(semID);
 
 
+     return; 
 
-    /*
-
-    // 5. Generate 20 random letters ('A'-'T')
-    char letters[ALPHABET_COUNT] = {
-        'A','B','C','D','E','F','G','H','I','J',
-        'K','L','M','N','O','P','Q','R','S','T'
-    };
-
-    for (int i = 0; i < 20; i++)
-    {
-        char letter = letters[rand() % ALPHABET_COUNT];
-
-        // 6. Lock semaphore
-        sem_wait(semID);                                                            // TODO : This currently uses the sephamore every letter, requirements want the letters written at once, we need to add validations and checks to make sure we do not overwrite the buffer before writing letters in. 
-
-        int nextIndex = (shmPtr->writeIndex + 1) % BUF_SIZE;
-
-        // 7. Check space, write as many as possible
-        if (nextIndex == shmPtr->readIndex)
-        {
-            printf("[DP-1] buffer full, cannot write '%c'\n", letter);  // Debug message [ERASE BEFORE SUBMISSION]
-            sem_signal(semID);  // Unlock semaphore
-            break;
-        }
-        shmPtr->buffer[shmPtr->writeIndex] = letter;
-
-        // 8. Update writeIndex (wrap around if needed)
-        shmPtr->writeIndex = nextIndex;
-
-        // 9. Unlock semaphore
-        sem_signal(semID);
-
-        */
-    }
 }
 
 
-/*
- * FUNCTION :    signal_handler()
- * DESCRIPTION : This function handles the SIGINT signal.
- *               It detaches from shared memory and cleans up before exiting.
- * PARAMETERS :  signum - signal number
- * RETURNS :     none
- */
 
-// SIGINT handler:
-// - Detach shared memory
-// - Clean up and exit
+
+
