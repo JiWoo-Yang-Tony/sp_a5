@@ -1,4 +1,10 @@
+// FILE NAME    : dc.c
+// PROGRAMMER   : Josh Horsley, Kalina Cathcart, John Paventi, Daimon Quin, Jiwoo Yang
+// DATE         : 2025-4-8
+// DESCRIPTION  :
+
 #include "shared.h"
+#include "dc.h"
 
 int main()
 {

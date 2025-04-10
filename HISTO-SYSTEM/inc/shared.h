@@ -1,3 +1,8 @@
+// FILE NAME    : shared.h
+// PROGRAMMER   : Josh Horsley, Kalina Cathcart, John Paventi, Daimon Quin, Jiwoo Yang
+// DATE         : 2025-4-8
+// DESCRIPTION  : 
+
 #ifndef SHARED_H
 #define SHARED_H
 

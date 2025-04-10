@@ -1,9 +1,58 @@
 // FILE NAME    : dp1.c
-// PROGRAMMER   : 
+// PROGRAMMER   : Josh Horsley, Kalina Cathcart, John Paventi, Daimon Quin, Jiwoo Yang
 // DATE         : 2025-4-8
 // DESCRIPTION  : 
 
 #include "shared.h"
+#include "dp1.h"
+
+int main()
+{
+    printf("Hello, DP-1!\n");   // Debug message [ERASE BEFORE SUBMISSION]
+
+    int shmID;
+    int semID;
+    SharedMemory *shmPtr;
+
+    // 1. Create shared memory
+    initialize_shared_memory(&shmID, &shmPtr);
+    
+    // 2. Initialize circular buffer inside initialize_shared_memory()
+    // 3. Create and initialize semaphore
+    semID = initialize_semaphore();
+
+    // 4. Fork and exec DP-2 with shmID as argv
+    pid_t pid = fork();
+
+    if (pid < 0)
+    {
+        perror("fork failed");
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        char shmStr[16];
+        snprintf(shmStr, sizeof(shmStr), "%d", shmID);
+
+        // Child process: exec DP-2
+        char *args[] = { "./bin/DP-2", shmStr, NULL };
+        execvp(args[0], args);
+
+        // If execvp fails, error handling
+        perror("execvp failed");
+        exit(EXIT_FAILURE);
+    } else {
+        printf("[DP-1] Forked DP-2 with PID %d\n", pid);    // Debug message [ERASE BEFORE SUBMISSION]
+    }
+
+    srand(time(NULL));  // Seed random number generator
+
+    while (1)
+    {
+        write_random_letters(shmPtr, semID);       
+        sleep(2);   // 10. Sleep 2 seconds
+    }
+
+    return 0;
+}
 
 void initialize_shared_memory(int *shmID, SharedMemory **shmPtr)
 {
@@ -84,54 +133,6 @@ void write_random_letters(SharedMemory *shmPtr, int semID)
         // 9. Unlock semaphore
         sem_signal(semID);
     }
-}
-
-int main()
-{
-    printf("Hello, DP-1!\n");   // Debug message [ERASE BEFORE SUBMISSION]
-
-    int shmID;
-    int semID;
-    SharedMemory *shmPtr;
-
-    // 1. Create shared memory
-    initialize_shared_memory(&shmID, &shmPtr);
-    
-    // 2. Initialize circular buffer inside initialize_shared_memory()
-    // 3. Create and initialize semaphore
-    semID = initialize_semaphore();
-
-    // 4. Fork and exec DP-2 with shmID as argv
-    pid_t pid = fork();
-
-    if (pid < 0)
-    {
-        perror("fork failed");
-        exit(EXIT_FAILURE);
-    } else if (pid == 0) {
-        char shmStr[16];
-        snprintf(shmStr, sizeof(shmStr), "%d", shmID);
-
-        // Child process: exec DP-2
-        char *args[] = { "./bin/DP-2", shmStr, NULL };
-        execvp(args[0], args);
-
-        // If execvp fails, error handling
-        perror("execvp failed");
-        exit(EXIT_FAILURE);
-    } else {
-        printf("[DP-1] Forked DP-2 with PID %d\n", pid);    // Debug message [ERASE BEFORE SUBMISSION]
-    }
-
-    srand(time(NULL));  // Seed random number generator
-
-    while (1)
-    {
-        write_random_letters(shmPtr, semID);       
-        sleep(2);   // 10. Sleep 2 seconds
-    }
-
-    return 0;
 }
 
 // SIGINT handler:

@@ -1,5 +1,5 @@
 // FILE NAME    : shared.c
-// PROGRAMMER   : 
+// PROGRAMMER   : Josh Horsley, Kalina Cathcart, John Paventi, Daimon Quin, Jiwoo Yang
 // DATE         : 2025-4-8
 // DESCRIPTION  : sem_wait(): Wait (P operation)
 //                sem_signal(): Signal (V operation)
