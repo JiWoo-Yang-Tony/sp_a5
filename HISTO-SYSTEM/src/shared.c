@@ -8,6 +8,21 @@
 // Global signal handling flag
 volatile sig_atomic_t shutdown_flag = 0;
 
+
+// Shared memory struct 
+typedef struct {
+    char buffer[BUF_SIZE];  // 256-byte circular buffer
+    int readIndex;          // DC's read position
+    int writeIndex;         // DP's write position
+} SharedMemory;
+
+
+/*
+ * FUNCTION :    sem_wait()
+ * DESCRIPTION : Impliments the locking mechanism for the sephamore
+ * PARAMETERS :  int semid - semaphore ID 
+ * RETURNS : 	 none
+ */
 void sem_wait(int semid)
 {
     struct sembuf p = { 0, -1, SEM_UNDO };
@@ -18,6 +33,13 @@ void sem_wait(int semid)
         }
     }
 }
+
+
+/* FUNCTION :    sem_signal()
+ * DESCRIPTION : Releases the sephamore from the locked state
+ * PARAMETERS :  int semid - semaphore ID 
+ * RETURNS :     none
+ */
 
 void sem_signal(int semid)
 {
