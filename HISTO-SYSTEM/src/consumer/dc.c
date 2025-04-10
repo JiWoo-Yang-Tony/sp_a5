@@ -12,19 +12,25 @@ volatile sig_atomic_t shutdownFlag = 0;
 int main(int argc, char *argv[])
 {
     printf("Hello, DC!\n");
-    SharedMemory shmPtr; 
-    int semID;
-    int shmID;
+    SharedMemory *shmPtr = NULL; 
+    int semID = -1;
+    int shmID = -1;
     int histogram[ALPHABET_COUNT] = {0};
     int doILoop = 0;
-    time_t startTime; 
+    time_t startTime;
+    pid_t dp1PID = -1;
+    pid_t dp2PID = -1;
 
     // 1. Parse shmID, DP-1 PID, DP-2 PID from argv[]
-    if(arc < 4)
+    if(argc < 4)
     {
-        fprintf(stderr, "[DC] Usage: %s <shmID> <DP_PID> <DP2_PID>\n", argv[0])
+        fprintf(stderr, "[DC] Usage: %s <shmID> <DP_PID> <DP2_PID>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+
+    shmID = atoi(argv[1]);
+    dp1PID = atoi(argv[2]);
+    dp2PID = atoi(argv[3]);
 
     // 2. Attach to shared memory
     shmPtr = (SharedMemory*)shmat(shmID, NULL, 0);
@@ -34,21 +40,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // 3. Initialize histogram counter array [A-T]
-        // Not sure how to do this
-
-    // 4. Set up SIGALRM every 2 seconds
-    signal(SIGALRM, sigalarm_handler);
-    struct itimerval timer;
-    timer.it_interval.tv_sec = 2;
-    timer.it_interval.tv_usec = 0;
-    timer.it_value = timer.it_interval;
-    setitimer(ITIMER_REAL, &timer, NULL);
-
-    // 5. Set up SIGINT handler
-    signal(SIGINT, sigint_hander);
-
-    // Get the semaphore
+    // Attach to semaphore
     semID = semget(SEM_KEY, 1, 0);
     if(semID < 0)
     {
@@ -56,7 +48,28 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    // 3. Initialize histogram counter array [A-T]
+        // Not sure how to do this
+
+    // 4. Set up SIGALRM every 2 seconds
+    struct sigaction sa_alarm, sa_int;
+    sa_alarm.sa_handler = sigalarm_handler;
+    sigemptyset(&sa_alarm.sa_mask);
+    sa_alarm.sa_flags = 0;
+
+    sa_int.sa_handler = sigint_handler;
+    sigemptyset(&sa_int.sa_mask);
+    sa_int.sa_flags = 0;
+
+    sigaction(SIGALRM, &sa_alarm, NULL);
+    sigaction(SIGINT, &sa_int, NULL);
+
+
+    // 5. Set up SIGINT handler
+    signal(SIGINT, sigint_handler);
+
     startTime = time(NULL);
+    alarm(2);
 
     while(1)
     {
@@ -73,9 +86,9 @@ int main(int argc, char *argv[])
             {
                 char letter = shmPtr->buffer[shmPtr->readIndex];
                 // 9. Count each letter (A-T)
-                if(letter >= 'A' && leter <= 'T')
+                if(letter >= 'A' && letter <= 'T')
                 {
-                    histogram[letter - 'A']++
+                    histogram[letter - 'A']++;
                 }
 
                 // 10. Update readIndex (wrap around) -- Not sure if this will work
@@ -86,14 +99,10 @@ int main(int argc, char *argv[])
             sem_signal(semID);
 
             // 12. Every 10 seconds -> clear screen, print histogram
-            if((time(NULL) - startTime) % 10 == 0)
+            time_t elapsed = time(NULL) - startTime;
+            if(elapsed % 10 == 0)
             {
-                system("clear");
-                printf("[DC] Letter Histogram:\n");
-                for(int i; i < ALPHABET_COUNT; i++)
-                {
-                    printf("%c: %d\n", 'A'+i, histogram[i]);
-                }
+                print_histogram(histogram);
             }
         }
 
@@ -107,11 +116,7 @@ int main(int argc, char *argv[])
     }
 
     // 14. Final histogram output
-    printf("\n[DC] Final Letter Histogram:\n");
-    for(int i; i <ALPHABET_COUNT; i++)
-    {
-        printf("%c: %d\n", 'A'+i, histogram[i]);
-    }
+    print_histogram(histogram);
 
     // 15. Clean up: detach shared memory and remove IPCs
     shmdt(shmPtr);
@@ -124,19 +129,30 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-// SIGALRM handler:
-// - Flag to indicate reading should occur
-void sigalarm_handler(int signal)
+void print_histogram(int histogram[])
 {
-    readFlag = 1;
+    system("clear");
+    printf("Histogram [A-T]:\n");
+    for (int i = 0; i < ALPHABET_COUNT; i++) 
+    {
+        char letter = 'A' + i;
+        printf("%c: %d\n", letter, histogram[i]);
+    }
+    printf("--------------------------\n");
 }
 
-// SIGINT handler:
-// - Send SIGINT to DP-1 and DP-2
-// - Set shutdown flag
-void sigint_handler(int signal)
+// SIGALRM handler:
+// - Flag to indicate reading should occur
+void sigalarm_handler(int signal) 
 {
-    shutdownFlag = 1;
-    kill(dp1PID, SIGINT);
-    kill(dp2PID, SIGINT);
+    //alarm_flag = 1;
+    alarm(2); // re-arm the alarm
+}
+
+void sigint_handler(int signal) 
+{
+    shutdown_flag = 1;
+    // Send SIGINT to DP-1 and DP-2
+    // kill(dp1_pid, SIGINT);
+    // kill(dp2_pid, SIGINT);
 }

@@ -13,4 +13,6 @@ void sigalarm_handler(int signal);
 
 void sigint_handler(int signal);
 
+void print_histogram(int histogram[]);
+
 #endif
