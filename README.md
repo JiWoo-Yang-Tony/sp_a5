@@ -17,10 +17,18 @@ HISTO-SYSTEM/
 │   ├── DP-2
 │   └── DC
 ├── src/
-│   ├── dp1.c
-│   ├── dp2.c
-│   └── dc.c
+│   ├── producer/
+│   │   ├── dp1.c
+│   │   ├── dp2.c
+│   ├── consumer/
+│   │   ├── dc.c
+│   └── shared.c
 ├── inc/
+│   ├── producer/
+│   │   ├── dp1.h
+│   │   ├── dp2.h
+│   ├── consumer/
+│   │   ├── dc.h
 │   └── shared.h
 ├── Makefile
 └── README.md
