@@ -7,7 +7,8 @@
 #include "dc.h"
 
 volatile sig_atomic_t readFlag = 0;
-volatile sig_atomic_t shutdownFlag = 0;
+pid_t dp1PID = -1;
+pid_t dp2PID = -1;
 
 int main(int argc, char *argv[])
 {
@@ -16,10 +17,7 @@ int main(int argc, char *argv[])
     int semID = -1;
     int shmID = -1;
     int histogram[ALPHABET_COUNT] = {0};
-    int doILoop = 0;
     time_t startTime;
-    pid_t dp1PID = -1;
-    pid_t dp2PID = -1;
 
     // 1. Parse shmID, DP-1 PID, DP-2 PID from argv[]
     if(argc < 4)
@@ -107,7 +105,7 @@ int main(int argc, char *argv[])
         }
 
         // 13. If SIGINT received and all data read -> break
-        if(shutdownFlag && shmPtr->readIndex == shmPtr->writeIndex)
+        if(shutdown_flag && shmPtr->readIndex == shmPtr->writeIndex)
         {
             break;
         }
@@ -152,7 +150,7 @@ void sigalarm_handler(int signal)
 void sigint_handler(int signal) 
 {
     shutdown_flag = 1;
-    // Send SIGINT to DP-1 and DP-2
-    // kill(dp1_pid, SIGINT);
-    // kill(dp2_pid, SIGINT);
+    //Send SIGINT to DP-1 and DP-2
+    kill(dp1PID, SIGINT);
+    kill(dp2PID, SIGINT);
 }
