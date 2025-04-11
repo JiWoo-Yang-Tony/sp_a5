@@ -6,7 +6,15 @@
 #ifndef DP1_H
 #define DP1_H
 
+#include <signal.h>
+#include <time.h>
+#include <stdbool.h>
+#include <unistd.h>
+
 #include "../../inc/shared.h"
+#include "dp1_utils.h"
+
+extern SharedMemory* global_shmPtr;
 
 void initialize_shared_memory(int *shmID, SharedMemory **shmPtr);
 
