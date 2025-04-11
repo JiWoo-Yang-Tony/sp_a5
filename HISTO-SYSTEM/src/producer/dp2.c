@@ -45,7 +45,6 @@ SharedMemory* global_shmPtr = NULL;
  */
 int main(int argc, char* argv[])
 {
-    printf("Hello, DP-2!\n");   // Debug message [ERASE BEFORE SUBMISSION]
 
     if (argc < 2)
     {

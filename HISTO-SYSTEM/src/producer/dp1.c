@@ -45,7 +45,6 @@ SharedMemory* global_shmPtr = NULL;
 
 int main()
 {
-    printf("Hello, DP-1!\n");   // Debug message [ERASE BEFORE SUBMISSION]
 
     int shmID;
     int semID;
@@ -55,7 +54,7 @@ int main()
     sa.sa_handler = handle_sigint;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
-    sigaction(SIGINT, &sa, NULL); // Detach shared memoryn(SIGINT, &sa, NULL);
+    sigaction(SIGINT, &sa, NULL);
 
     initialize_shared_memory(&shmID, &shmPtr);
        
@@ -78,7 +77,6 @@ int main()
         perror("execvp failed");
         exit(EXIT_FAILURE);
     } else {
-        printf("[DP-1] Forked DP-2 with PID %d\n", pid);    // Debug message [ERASE BEFORE SUBMISSION]
     }
 
 	srand(time(NULL));

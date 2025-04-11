@@ -17,7 +17,6 @@ SharedMemory *shmPtr = NULL;
 
 int main(int argc, char *argv[])
 {
-    printf("Hello, DC!\n");
     
     int shmID = -1;
     int *histogram;

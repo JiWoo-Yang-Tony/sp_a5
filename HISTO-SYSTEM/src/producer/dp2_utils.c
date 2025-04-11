@@ -28,7 +28,6 @@ void write_one_letter(SharedMemory *shmPtr, int semID)
 
     if (nextIndex == shmPtr->readIndex)
     {
-        printf("[DP-2] buffer full, cannot write '%c'\n", letter);  // Debug message [ERASE BEFORE SUBMISSION]
         sem_signal(semID);  
         return;
     }
@@ -36,7 +35,6 @@ void write_one_letter(SharedMemory *shmPtr, int semID)
     shmPtr->buffer[shmPtr->writeIndex] = letter;
 
     shmPtr->writeIndex = nextIndex;
-    printf("[DP-2] wrote '%c' to buffer at index %d\n", letter, shmPtr->writeIndex);  // Debug message [ERASE BEFORE SUBMISSION]
 
     sem_signal(semID);
 }

@@ -1,3 +1,8 @@
+// FILE NAME    : x
+// PROGRAMMER   : Josh Horsley, Kalina Cathcart, John Paventi, Daimon Quin, Jiwoo Yang
+// DATE         : 2025-04-11
+// DESCRIPTION  : x
+
 #include "dp1_utils.h"
 
 
@@ -49,8 +54,6 @@ void handle_sigint(int sig)
      memset((*shmPtr)->buffer, 0, BUF_SIZE);
      (*shmPtr)->readIndex = 0;
      (*shmPtr)->writeIndex = 0;
- 
-     printf("[DP-1] Shared memory initialized.\n");  // Debug message [ERASE BEFORE SUBMISSION]
  }
 
  /*
@@ -76,8 +79,6 @@ int initialize_semaphore()
         perror("semctl SETVAL failed");
         exit(EXIT_FAILURE);
     }
-
-    printf("[DP-1] Semaphore initialized.\n");  // Debug message [ERASE BEFORE SUBMISSION]
     return semID;
 }
 
