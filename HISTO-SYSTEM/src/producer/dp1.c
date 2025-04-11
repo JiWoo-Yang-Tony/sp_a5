@@ -31,7 +31,7 @@
 
 
  // Global pointer for signal handler cleanup (necessary evil)
-static SharedMemory* global_shmPtr = NULL;
+SharedMemory* global_shmPtr = NULL;
 
 /*
  * FUNCTION :    main()

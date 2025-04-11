@@ -7,7 +7,8 @@
 #define DP2_H
 
 #include "../../inc/shared.h"
+#include "dp2_utils.h"
 
-void write_one_letter(SharedMemory *shmPtr, int semID);
+extern SharedMemory* global_shmPtr;
 
 #endif

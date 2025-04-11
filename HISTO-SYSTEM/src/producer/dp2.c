@@ -25,23 +25,10 @@
 #include "dp2.h"
 
 // Global pointer for signal handler cleanup
-static SharedMemory* global_shmPtr = NULL;
+SharedMemory* global_shmPtr = NULL;
 
 
-/*
- * FUNCTION :    handle_sigint()
- * DESCRIPTION : Handles SIGINT signal by detaching from shared memory
- * PARAMETERS :  sig - signal number (unused)
- * RETURNS :     none
- */
-void handle_sigint(int sig)
-{
-    if (global_shmPtr)
-    {
-        shmdt(global_shmPtr);
-    }
-    _exit(EXIT_SUCCESS);
-}
+
 
 
 
@@ -60,7 +47,6 @@ int main(int argc, char* argv[])
 {
     printf("Hello, DP-2!\n");   // Debug message [ERASE BEFORE SUBMISSION]
 
-    // 1. Parse shmID from argv[1]
     if (argc < 2)
     {
         fprintf(stderr, "[DP-2] Usage: %s <shmID>\n", argv[0]);
@@ -69,11 +55,9 @@ int main(int argc, char* argv[])
 
     int shmID = atoi(argv[1]);
 
-    // 2. Get required PIDs
     pid_t dp1_pid = getppid();
     pid_t dp2_pid = getpid();
 
-    // 3. Fork and launch DC process
     pid_t dc_pid = fork();
     if (dc_pid < 0)
     {
@@ -92,7 +76,6 @@ int main(int argc, char* argv[])
         _exit(EXIT_FAILURE);
     }
 
-    // 4. Attach to shared memory
     SharedMemory* shmPtr = (SharedMemory*)shmat(shmID, NULL, 0);
     if (shmPtr == (void*)-1)
     {
@@ -101,7 +84,6 @@ int main(int argc, char* argv[])
     }
     global_shmPtr = shmPtr;
 
-    // 5. Connect to semaphore
     int semID = semget(SEM_KEY, 1, 0);
     if (semID < 0)
     {
@@ -109,7 +91,6 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    // Set up signal handler
     struct sigaction sa;
     sa.sa_handler = handle_sigint;
     sigemptyset(&sa.sa_mask);
@@ -117,65 +98,14 @@ int main(int argc, char* argv[])
     sigaction(SIGINT, &sa, NULL);
 
 
-    srand(time(NULL) + getpid());   // randomize seed with PID to avoid same sequence with DP-1
+    srand(time(NULL) + getpid());   
 
     while (1)
     {
         write_one_letter(shmPtr, semID);
-        usleep(50000);  // 11. Sleep 1/20 second
+        usleep(50000);
     }
     
     return 0;
 }
-
-
-
-
-/*
- * FUNCTION :    write_one_letter()
- * DESCRIPTION : Writes single random letter to circular buffer
- *               1. Generates random letter A-T
- *               2. Locks semaphore
- *               3. Checks buffer space
- *               4. Writes letter if space available
- *               5. Handles circular buffer wrap-around
- *               6. Unlocks semaphore
- * PARAMETERS :  shmPtr - pointer to shared memory structure
- *               semID - semaphore ID
- * RETURNS :     none
- */
-void write_one_letter(SharedMemory *shmPtr, int semID)
-{
-    // 6. Generate 1 random letter ('A'-'T')
-    char letters[ALPHABET_COUNT] = {
-        'A','B','C','D','E','F','G','H','I','J',
-        'K','L','M','N','O','P','Q','R','S','T'
-    };
-
-    char letter = letters[rand() % ALPHABET_COUNT];
-
-    // 7. Lock semaphore
-    sem_wait(semID);
-
-    int nextIndex = (shmPtr->writeIndex + 1) % BUF_SIZE;
-
-    // 8. Check space, write if buffer is not full
-    if (nextIndex == shmPtr->readIndex)
-    {
-        printf("[DP-2] buffer full, cannot write '%c'\n", letter);  // Debug message [ERASE BEFORE SUBMISSION]
-        sem_signal(semID);  // Unlock semaphore
-        return;
-    }
-
-    // 9. Write one letter
-    shmPtr->buffer[shmPtr->writeIndex] = letter;
-
-    // 10. Update writeIndex (wrap around)
-    shmPtr->writeIndex = nextIndex;
-    printf("[DP-2] wrote '%c' to buffer at index %d\n", letter, shmPtr->writeIndex);  // Debug message [ERASE BEFORE SUBMISSION]
-
-    // 11. Unlock semaphore
-    sem_signal(semID);
-}
-
 
