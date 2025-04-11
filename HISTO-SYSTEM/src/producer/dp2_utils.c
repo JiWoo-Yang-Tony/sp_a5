@@ -1,3 +1,10 @@
+// FILE NAME    : dp2_utils.c
+// PROGRAMMER   : Josh Horsley, Kalina Cathcart, John Paventi, Daimon Quin, Jiwoo Yang
+// DATE         : 2025-04-11
+// DESCRIPTION  : Holds the utility functions for DP-2 process
+//               1. write_one_letter() - Writes a single random letter to the circular buffer
+//               2. handle_sigint() - Handles SIGINT signal by detaching from shared memory
+
 #include "dp2_utils.h"
 
 /*

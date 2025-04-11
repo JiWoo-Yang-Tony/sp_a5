@@ -27,9 +27,6 @@
 #include "shared.h"
 #include "dp1.h"
 
-
-
-
  // Global pointer for signal handler cleanup (necessary evil)
 SharedMemory* global_shmPtr = NULL;
 

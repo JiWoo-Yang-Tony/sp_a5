@@ -1,7 +1,18 @@
 // FILE NAME    : dc.c
 // PROGRAMMER   : Josh Horsley, Kalina Cathcart, Jon Paventi, Daimon Quin, Jiwoo Yang
 // DATE         : 2025-4-8
-// DESCRIPTION  :
+// DESCRIPTION  : This program will do the following:
+//                              Initial Setup:
+//                              1. Receives shared memory ID from DP-1 as command line argument
+//                              2. Gets its own PID and parent DP-1's PID
+//                              3. Attaches to existing shared memory segment
+//                              4. Connects to existing semaphore
+//                              5. Launches DP-1 and DP-2 processes
+//                              6. Sets up signal handlers for SIGINT and SIGALRM
+//                              7. Enters consumer loop
+//                              8. Prints histogram of letters processed
+//                              9. Cleans up shared memory and semaphore
+//                              10. Exits gracefully
 
 #include "shared.h"
 #include "dc.h"
@@ -14,6 +25,7 @@ pid_t dp2PID = -1;
 
 int semID = -1;
 SharedMemory *shmPtr = NULL; 
+
 
 int main(int argc, char *argv[])
 {

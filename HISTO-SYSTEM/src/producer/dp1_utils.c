@@ -1,7 +1,11 @@
-// FILE NAME    : x
+// FILE NAME    : dp1_utils.c
 // PROGRAMMER   : Josh Horsley, Kalina Cathcart, John Paventi, Daimon Quin, Jiwoo Yang
 // DATE         : 2025-04-11
-// DESCRIPTION  : x
+// DESCRIPTION  : Holds the utility functions for DP-1 process
+//               1. handle_sigint() - Handles SIGINT signal by detaching from shared memory
+//               2. initialize_shared_memory() - Initializes shared memory and circular buffer
+//               3. initialize_semaphore() - Initializes semaphore for synchronization
+//               4. write_random_letters() - Generates random letters and writes them to the circular buffer
 
 #include "dp1_utils.h"
 

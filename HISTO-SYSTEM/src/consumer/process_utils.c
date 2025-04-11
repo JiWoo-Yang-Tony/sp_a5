@@ -1,7 +1,23 @@
+// FILE NAME    : process_utils.c
+// PROGRAMMER   : Josh Horsley, Kalina Cathcart, John Paventi, Daimon Quin, Jiwoo Yang
+// DATE         : 2025-04-11
+// DESCRIPTION  : This file contains the implementation of the consumer process (DC) for the histogram system.
+//              1. run_consumer_loop() - Main loop for the consumer process, processes letters from the circular buffer.
+//              2. print_histogram() - Prints the histogram of letters processed.
+
 #include "shared.h"
 #include "process_utils.h"
 #include "dc.h"
 
+/*
+ * FUNCTION :    run_consumer_loop()
+ * DESCRIPTION : This function runs the consumer loop, processing letters from the circular buffer.
+ * PARAMETERS :  int *histogram - pointer to histogram array
+ *               int shmID - shared memory ID
+ *               int *readIndex - pointer to read index
+ *               int *secondsElapsed - pointer to seconds elapsed
+ * RETURNS :     none
+ */
 void run_consumer_loop(int *histogram, int shmID, int *readIndex, int *secondsElapsed) 
 {
     while (1) 
@@ -48,6 +64,12 @@ void run_consumer_loop(int *histogram, int shmID, int *readIndex, int *secondsEl
     }
 }
 
+/*
+ * FUNCTION :    x
+ * DESCRIPTION : x
+ * PARAMETERS :  x
+ * RETURNS :     x
+ */
 void print_histogram(int histogram[])
 {
     system("clear");             

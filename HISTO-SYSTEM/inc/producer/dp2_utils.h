@@ -1,7 +1,7 @@
 // FILE NAME    : dp2_utils.h
 // PROGRAMMER   : Josh Horsley, Kalina Cathcart, John Paventi, Daimon Quin, Jiwoo Yang
 // DATE         : 2025-04-11
-// DESCRIPTION  : 
+// DESCRIPTION  : Holds the utility functions for DP-2 process
 
 #ifndef DP2_UTILS_H
 #define DP2_UTILS_H
