@@ -6,15 +6,16 @@
 #ifndef DC_H
 #define DC_H
 
+#include <signal.h>
 #include "../../inc/shared.h"
+#include "process_utils.h"
+#include "signal_utils.h"
 
-// Function declarations for DC process
-void sigalarm_handler(int signal);
-
-void sigint_handler(int signal);
-
-void print_histogram(int histogram[]);
-
-void run_consumer_loop(int *histogram, int shmID, int *readIndex, int *secondsElapsed);;
+extern volatile sig_atomic_t readFlag;
+extern volatile sig_atomic_t shutdownFlag;
+extern pid_t dp1PID;
+extern pid_t dp2PID;
+extern int semID;
+extern SharedMemory *shmPtr;
 
 #endif

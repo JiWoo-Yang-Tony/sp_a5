@@ -6,7 +6,7 @@ OBJ_DIR = obj
 BIN_DIR = bin
 
 PRODUCER_SRC = $(SRC_DIR)/producer/dp1.c $(SRC_DIR)/producer/dp2.c
-CONSUMER_SRC = $(SRC_DIR)/consumer/dc.c
+CONSUMER_SRC = $(SRC_DIR)/consumer/dc.c $(SRC_DIR)/consumer/process_utils.c $(SRC_DIR)/consumer/signal_utils.c
 SHARED_SRC = $(SRC_DIR)/shared.c
 
 SRCS = $(PRODUCER_SRC) $(CONSUMER_SRC) $(SHARED_SRC)
@@ -27,7 +27,7 @@ $(BIN_DIR)/DP-2: $(OBJ_DIR)/producer/dp2.o $(OBJ_DIR)/shared.o
 	@mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $^
 
-$(BIN_DIR)/DC: $(OBJ_DIR)/consumer/dc.o $(OBJ_DIR)/shared.o
+$(BIN_DIR)/DC: $(OBJ_DIR)/consumer/dc.o $(OBJ_DIR)/consumer/process_utils.o $(OBJ_DIR)/consumer/signal_utils.o $(OBJ_DIR)/shared.o
 	@mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $^
 
