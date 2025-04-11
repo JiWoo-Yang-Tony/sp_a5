@@ -15,4 +15,6 @@ void sigint_handler(int signal);
 
 void print_histogram(int histogram[]);
 
+void run_consumer_loop(int *histogram, int shmID, int *readIndex, int *secondsElapsed);;
+
 #endif
